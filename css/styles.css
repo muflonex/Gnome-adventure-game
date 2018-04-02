@@ -1,0 +1,15 @@
+body{
+  margin: 0;  
+}
+canvas {
+  border: 1px dotted red;
+  margin: 0 auto;
+  width: auto; 
+  background-color: #1a0d00;
+}
+.container{
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  background-image: url('../images/wood.jpeg')
+}
