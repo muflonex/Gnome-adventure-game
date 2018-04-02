@@ -2,6 +2,7 @@ function Game(canvas){
   this.canvas = document.getElementById(canvas);
   this.ctx = this.canvas.getContext("2d");
   this.background = new Background(this);
+  this.plane = new Plane(this);
 }
 
 Game.prototype.start = function() {
@@ -9,7 +10,7 @@ Game.prototype.start = function() {
   //if (this.started) {
     //return;
   //}
-
+  this.plane.setListeners();
   this.interval = setInterval(function() {
     this.clear();
     this.move();
@@ -26,6 +27,7 @@ Game.prototype.start = function() {
 
 Game.prototype.draw = function() {
   this.background.draw();
+  this.plane.draw();
 };
 
 Game.prototype.clear = function() {
@@ -33,6 +35,6 @@ Game.prototype.clear = function() {
 };
 
 Game.prototype.move = function() {
-
+   this.plane.move();
    this.background.move();
  };
