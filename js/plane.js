@@ -1,7 +1,4 @@
-var left  = "left"
-var right = "right"
-var up    = "up"
-var down  = "down"
+//Keys that are currently active according to Listener
 var keys = []
 
 function Plane (game) {
@@ -10,27 +7,29 @@ function Plane (game) {
   this.y0 = (this.game.canvas.height-150);
   this.y = this.y0;
   this.w = 80;
-  this.h = 120
-  this.velocityX = 0
-  this.velocityY = 0
-  this.maxVelocity = 12
-  this.inertia = .97
+  this.h = 120;
+  this.velocityX = 0;
+  this.velocityY = 0;
+  this.maxVelocity = 12;
+  this.inertia = .97;
   this.img = new Image();
   this.img.src = "./images/balloon.png";
-  this.cannonballs = []
+  this.cannonballs = [];
 }
 
 Plane.prototype.draw = function(){
   this.game.ctx.drawImage(this.img, this.x, this.y, this.w, this.h)
+  if (this.game.framesCounter % 60 === 0){
+    this.shoot();
+  }
   this.cannonballs.forEach(function(ball){
-    ball.draw();
+    ball.draw()
   })
 }
 
 Plane.prototype.setListeners = function () {
   document.onkeydown = function (event) {
     keys[event.keyCode] = true;
-    console.log(keys["32"])
   }.bind(this)
   document.onkeyup = function (event) {
     keys[event.keyCode] = false;
@@ -38,7 +37,10 @@ Plane.prototype.setListeners = function () {
 }
 
 Plane.prototype.move = function(){
-  this.cannonballs.forEach(function(ball) { ball.move(); })
+
+  // We use IF here even though it looks like a good place for a switch 
+  // because it's easier to cover conjunctions of two keys 
+  
   if(keys[37]){
     if( this.velocityX > -this.maxVelocity)
     { this.velocityX-- }
@@ -55,21 +57,21 @@ Plane.prototype.move = function(){
     if( this.velocityY < this.maxVelocity)
     { this.velocityY++ }
   }
-  if(keys[32]){
-    this.shoot()
-  }
+  //applying inertia effect
+  //changing position according to velocity
   this.velocityY *= this.inertia;
   this.y += this.velocityY
   this.velocityX *= this.inertia;
   this.x += this.velocityX
 
-  if( this.x <= 0  ){
+  //Checking for canvas borders
+  if( this.x <= 0 ){
     this.x = 0
   }
   if( this.x >= this.game.canvas.width - this.w ){
     this.x = this.game.canvas.width - this.w
   }
-  if( this.y <= 0  ){
+  if( this.y <= 0 ){
     this.y = 0
   }
   if( this.y >= this.game.canvas.height - this.h ){
@@ -79,6 +81,7 @@ Plane.prototype.move = function(){
 Plane.prototype.shoot = function(){
   this.cannonballs.push(new Cannonball(this.game, this))
 }
+//We clear all balls that left canvas out of the cannonballs array
 Plane.prototype.eliminateBalls = function(){
   this.cannonballs.filter(function(ball){
     return ball.y > 0

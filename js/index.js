@@ -5,5 +5,6 @@ window.onload = function() {
   var down  = "down"
   var keys  = []
   var game = new Game("my-canvas");
+  
   game.start();
 }

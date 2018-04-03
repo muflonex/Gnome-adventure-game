@@ -2,7 +2,9 @@ body{
   margin: 0;  
 }
 canvas {
-  border: 1px dotted red;
+  border-style: inset;
+  border-width: 0 20px 0 20px; 
+  border-color: goldenrod;
   margin: 0 auto;
   width: auto; 
   background-color: #1a0d00;
