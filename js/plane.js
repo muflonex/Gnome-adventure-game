@@ -13,6 +13,7 @@ function Plane (game) {
   this.velocityX = 0;
   this.velocityY = 0;
   this.maxVelocity = 12;
+  //Rate per frame at which lingering effect of velocity dissipates
   this.inertia = .97;
   this.img = new Image();
   this.img.src = "./images/balloon.svg";
@@ -21,6 +22,8 @@ function Plane (game) {
 
 Plane.prototype.draw = function(){
   this.game.ctx.drawImage(this.img, this.x, this.y, this.w, this.h)
+  // Shoot every 60 clicks. No point making our player keep pressing, 
+  // unless we apply cannon refresh method 
   if (this.game.framesCounter % 60 === 0){
     this.shoot();
   }
@@ -30,6 +33,9 @@ Plane.prototype.draw = function(){
 }
 
 Plane.prototype.setListeners = function () {
+  // The movement event will fire as long as
+  // as the button remains pressed
+  // It means that effects of two buttons can apply
   document.onkeydown = function (event) {
     keys[event.keyCode] = true;
   }.bind(this)
@@ -59,8 +65,8 @@ Plane.prototype.move = function(){
     if( this.velocityY < this.maxVelocity)
     { this.velocityY++ }
   }
-  //applying inertia effect
-  //changing position according to velocity
+  //Applying inertia effect
+  //Changing position according to velocity
   this.velocityY *= this.inertia;
   this.y += this.velocityY
   this.velocityX *= this.inertia;
@@ -93,13 +99,15 @@ Plane.prototype.eliminateBalls = function(){
 Plane.prototype.collider = function(){
   var planeCollision = false;
   this.game.minions.forEach(function(minion){
+    // We reduce collision box of the minion because
+    // it's a sprite that has larger frames than it's visible size
     if (                                                                       
-       minion.x + minion.w > this.x       &&
-       minion.x < this.x          &&
-       minion.y + minion.h > this.y  &&                    
-       minion.y < this.y      
+       minion.x + minion.w - 50 > this.x  &&
+       minion.x -50 < this.x             &&
+       minion.y + minion.h -50 > this.y  &&                    
+       minion.y -50 < this.y      
     )
-      {  console.log("collision")
+      {  confirm("You've died!");
       }
   }.bind(this));
 }

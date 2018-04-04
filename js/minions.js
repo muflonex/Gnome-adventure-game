@@ -2,8 +2,8 @@ function Minion(game, x){
   this.game = game;
   //starting position, depending on object's index in the array of minions
   this.x = 1200 + x;
-  this.h = 200;
-  this.w = 200;
+  this.h = 150;
+  this.w = 150;
   this.y = 20;
   this.velocity = 0;
   this.frameIndex = Math.floor(Math.random()*5)+1
@@ -16,8 +16,8 @@ function Minion(game, x){
   
 }
 
-Minion.prototype.dragonlings = function(amount, frame){
-  for(i = 0; i < amount; i++){
+Minion.prototype.dragonlings = function(amount){
+  for(i = 0; i <= amount; i++){
     this.game.ctx.drawImage(
       this.img,
       0,
@@ -44,27 +44,43 @@ Minion.prototype.draw = function (amount){
 }
 
 Minion.prototype.move = function () {
-    this.velocity = 5;
-    this.x -= this.velocity
-    this.velocity = 0;
-};
+  var leftEdge = this.game.minions[this.game.minions.length-1].x
+  var rightEdge = this.game.minions[this.game.minions.length-1].w
+  
+  this.velocity = 5;
 
+  this.x -= this.velocity
+  if(leftEdge+rightEdge<0)
+  { this.game.minions.forEach(function(minion, index){
+    minion.x = 1200+200*index
+  }) }    
+};
+// Check for collisions between balls and monsters
 Minion.prototype.collider = function(){  
   var ballz = this.game.plane.cannonballs
   var meanies = this.game.minions
 
   ballz.forEach(function(ball){
-    if(                                                               
-       ball.x < this.w + this.x  &&
-       ball.x + ball.r > this.x  &&
-       ball.y < this.h + this.y  &&                    
-       ball.y + ball.r > this.y 
+    if(       
+      // Same as with the plane case we reduce collision box
+      // to make dragons harder to hit                                                        
+       ball.x < this.w + this.x -25 &&
+       this.x < ball.x + ball.r -25 &&
+       ball.y < this.h + this.y -25 &&                    
+       this.y < ball.y + ball.r -25
       )     
       { this.health -=1   
+        // remove ball after it hits a target
         ballz.splice(ballz.indexOf(ball),1)
-        if(this.health === 0){
-          meanies.splice(meanies.indexOf(this), 1)
-        }
+        // despawn dragons if they run out of health
+        this.despawn();
       }
   }.bind(this));
+}
+// The function that will be used to free memory from killed minions
+Minion.prototype.despawn = function(){
+    var meanies = this.game.minions;
+  if(this.health === 0){
+    meanies.splice(meanies.indexOf(this), 1)
+  }
 }

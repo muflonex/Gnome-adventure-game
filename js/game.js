@@ -25,7 +25,6 @@ Game.prototype.start = function() {
     this.generateClouds();
     this.plane.eliminateBalls();
     this.spawn(this.waveSize);
-    this.despawn();
     this.move();
     this.draw();
     this.minions.forEach(function(minion){ minion.animate()})
@@ -36,11 +35,11 @@ Game.prototype.start = function() {
 };
 
 Game.prototype.draw = function() {
-  //Canvas painter functions invocation in Z order from bottom to top
+  // Canvas painter functions invocation in Z order from bottom to top
   this.background.draw();
   this.clouds.forEach(function(nimbus) { nimbus.draw(); })
   this.plane.draw();
-  this.minions.forEach(function(minion){ minion.draw(this.minionCounter); })
+  this.minions.forEach(function(minion){ minion.draw(this.waveSize) }.bind(this))
 };
 
 Game.prototype.clear = function() {
@@ -54,10 +53,8 @@ Game.prototype.move = function() {
   this.clouds.forEach(function(o) { o.move(); })
   this.plane.cannonballs.forEach(function(ball) { ball.move() })
   this.plane.move();
-  // Resolve movement only if the first minion didn't reach X: 100
-  if(this.framesCounter >= 70 && this.minions.length > 0 && this.minions[0].x > 100 ){
-    this.minions.forEach(function(minion){ minion.move() })
-  }
+  this.minions.forEach(function(minion){ minion.move() })
+  
 };
 
 Game.prototype.generateClouds = function(){
@@ -70,7 +67,7 @@ Game.prototype.generateClouds = function(){
     this.clouds.push(new Clouds(this, randomFrame, randomOpacity ))
   }
 }
-// When our clouds leave canvas, we remove them from memory slot taken by the array
+// When our clouds leave canvas, we remove them from a memory slot taken by the array
 Game.prototype.eliminateClouds = function(){
   this.clouds = this.clouds.filter(function(o) {
     return o.y < 650;
@@ -82,9 +79,9 @@ Game.prototype.spawn = function(amount){
   if (this.framesCounter % 70 === 0) {
     // If there are no minions left on board
     if( this.minions.length === 0){
-      // Amplify size of the wave
       // Push new minions into the array
-      for(i = 0 ; i < amount ; i++){
+      for(i = 0 ; i <= amount ; i++){
+        // Amplify size of the wave
         // Position argument we pass to constructor so that 
         // each minion has unique X position for a particular meanie
         var position = i*this.canvas.width/this.waveSize
@@ -94,13 +91,7 @@ Game.prototype.spawn = function(amount){
     }
   }
 }
-// The function that will be used to free memory from killed minions
-// or the ones that leave the canvas
-Game.prototype.despawn = function(){
-  //this.minions = this.minions.filter(function(minion) {
-  //  return minion.x > 0;
-  // })
-}
+
 
 // Colission checking function - will call respective functions later on
 Game.prototype.collider = function() {
