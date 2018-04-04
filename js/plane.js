@@ -102,12 +102,14 @@ Plane.prototype.collider = function(){
     // We reduce collision box of the minion because
     // it's a sprite that has larger frames than it's visible size
     if (                                                                       
-       minion.x + minion.w - 50 > this.x  &&
+       minion.x + minion.w - 50 > this.x &&
        minion.x -50 < this.x             &&
        minion.y + minion.h -50 > this.y  &&                    
        minion.y -50 < this.y      
     )
-      {  confirm("You've died!");
+      { this.game.clear()
+        this.game.pause = true;
+        confirm("You've died!");
       }
   }.bind(this));
 }

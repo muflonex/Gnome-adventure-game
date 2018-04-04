@@ -7,31 +7,35 @@ function Game(canvas){
   this.framesCounter = 0;
   this.waveSize = 3;
   this.minions = []
+  //Serves as stop flag for frame request
+  this.pause = false;
 }
 
 Game.prototype.start = function() {
-
   //we initiate key listeners for the airship movement
   this.plane.setListeners();
-  this.interval = setInterval(function() {
-    // We count frames for events that occur with
-    // different frequency than our interval
-    this.framesCounter++;
+  // We count frames for events that occur with
+  // different frequency than our interval
+  this.framesCounter++;
 
-    // We reset counter to facilitate event repetition
-    if (this.framesCounter > 1000) this.framesCounter = 0;
-    this.clear();
-    this.eliminateClouds();
-    this.generateClouds();
-    this.plane.eliminateBalls();
-    this.spawn(this.waveSize);
-    this.move();
-    this.draw();
-    this.minions.forEach(function(minion){ minion.animate()})
-    // We check for collisions
-    this.collider();
-  }.bind(this), 1000 / 60);
-
+  // We reset counter to facilitate event repetition
+  if (this.framesCounter > 1000) this.framesCounter = 0;
+  
+  this.clear();
+  this.eliminateClouds();
+  this.generateClouds();
+  this.plane.eliminateBalls();
+  this.spawn(this.waveSize);
+  this.move();
+  this.draw();
+  this.minions.forEach(function(minion){ minion.animate()})
+  // We check for collisions
+  this.collider();
+  // It's simpler way of stopping frame request without encapsulating it
+  if (this.pause) return
+  // fun part - using requestAnimationFrame instead of
+  // setInterval for resources savings and less GPU throtling
+  requestAnimationFrame(this.start.bind(this));
 };
 
 Game.prototype.draw = function() {
