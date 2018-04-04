@@ -3,7 +3,9 @@ var keys = []
 
 function Plane (game) {
   this.game = game;
+  // put the airship in the middle of canvas' width
   this.x = this.game.canvas.width/2;
+  //
   this.y0 = (this.game.canvas.height-150);
   this.y = this.y0;
   this.w = 80;
@@ -86,4 +88,18 @@ Plane.prototype.eliminateBalls = function(){
   this.cannonballs.filter(function(ball){
     return ball.y > 0
   })
+}
+// Check for plane collisions
+Plane.prototype.collider = function(){
+  var planeCollision = false;
+  this.game.minions.forEach(function(minion){
+    if (                                                                       
+       minion.x + minion.w > this.x       &&
+       minion.x < this.x          &&
+       minion.y + minion.h > this.y  &&                    
+       minion.y < this.y      
+    )
+      {  console.log("collision")
+      }
+  }.bind(this));
 }

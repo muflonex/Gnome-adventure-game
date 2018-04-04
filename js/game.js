@@ -5,97 +5,106 @@ function Game(canvas){
   this.plane = new Plane(this);
   this.clouds = [ new Clouds(this), new Clouds(this), new Clouds(this) ];
   this.framesCounter = 0;
+  this.waveSize = 3;
   this.minions = []
 }
 
 Game.prototype.start = function() {
 
-  //if (this.started) {
-    //return;
-  //}
+  //we initiate key listeners for the airship movement
   this.plane.setListeners();
   this.interval = setInterval(function() {
+    // We count frames for events that occur with
+    // different frequency than our interval
     this.framesCounter++;
-    if (this.framesCounter > 1000) this.framesCounter = 0;
 
+    // We reset counter to facilitate event repetition
+    if (this.framesCounter > 1000) this.framesCounter = 0;
     this.clear();
     this.eliminateClouds();
     this.generateClouds();
     this.plane.eliminateBalls();
-    this.spawn(7);
+    this.spawn(this.waveSize);
     this.despawn();
     this.move();
     this.draw();
-
+    this.minions.forEach(function(minion){ minion.animate()})
+    // We check for collisions
+    this.collider();
   }.bind(this), 1000 / 60);
-  
-  //this.started = true;
+
 };
 
-//Game.prototype.stop = function() {
-//  clearInterval(this.interval);
- // this.started = false;
-//};
-
 Game.prototype.draw = function() {
+  //Canvas painter functions invocation in Z order from bottom to top
   this.background.draw();
   this.clouds.forEach(function(nimbus) { nimbus.draw(); })
   this.plane.draw();
-  this.minions.forEach(function(minion){ minion.draw(7); })
+  this.minions.forEach(function(minion){ minion.draw(this.minionCounter); })
 };
 
 Game.prototype.clear = function() {
+  // Frame clearing
   this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
 
 Game.prototype.move = function() {
+  // Call for movement resolution functions
   this.background.move();
   this.clouds.forEach(function(o) { o.move(); })
   this.plane.cannonballs.forEach(function(ball) { ball.move() })
   this.plane.move();
-  if(this.framesCounter >= 70 && this.minions[0].x > 190 ){
+  // Resolve movement only if the first minion didn't reach X: 100
+  if(this.framesCounter >= 70 && this.minions.length > 0 && this.minions[0].x > 100 ){
     this.minions.forEach(function(minion){ minion.move() })
   }
 };
 
 Game.prototype.generateClouds = function(){
+  // Generate a cloud every 40 ticks 
   if (this.framesCounter % 40 === 0) {
+    // An argument for frame of the sprite to generate look
     var randomFrame = Math.floor(Math.random()*3)
+    // An argument for random cloud opacity
     var randomOpacity = Math.random()*0.5+0.2
     this.clouds.push(new Clouds(this, randomFrame, randomOpacity ))
   }
 }
+// When our clouds leave canvas, we remove them from memory slot taken by the array
 Game.prototype.eliminateClouds = function(){
   this.clouds = this.clouds.filter(function(o) {
     return o.y < 650;
   })
 }
+// Evil meanies spawning mechanism
 Game.prototype.spawn = function(amount){
+  // We perform a check every 70 ticks
   if (this.framesCounter % 70 === 0) {
+    // If there are no minions left on board
     if( this.minions.length === 0){
+      // Amplify size of the wave
+      // Push new minions into the array
       for(i = 0 ; i < amount ; i++){
-        this.minions.push(new Minion(this))
+        // Position argument we pass to constructor so that 
+        // each minion has unique X position for a particular meanie
+        var position = i*this.canvas.width/this.waveSize
+        this.minions.push(new Minion( this , position ))
       }
+      this.waveSize++
     }
   }
 }
-
+// The function that will be used to free memory from killed minions
+// or the ones that leave the canvas
 Game.prototype.despawn = function(){
-  this.minions = this.minions.filter(function(minion) {
-    return minion.x > 0;
-  })
+  //this.minions = this.minions.filter(function(minion) {
+  //  return minion.x > 0;
+  // })
 }
 
-Game.prototype.isCollision = function() {
-  var collision = false;
-  this.minions.forEach(function(minion){
-    if ( ( 
-      ( this.plane.x + this.plane.w ) > ( minion.x - minion.r ) ) &&
-      ( this.plane.x < ( minion.x + minion.r ) )  &&
-      ( this.plane.y + this.plane.h ) >= ( minion.y - minion.r ) &&
-      ( this.plane.y < ( minion.y - minion.r ) )
-    )
-      { collision = true; }
-  }.bind(this));
-  return collision;
+// Colission checking function - will call respective functions later on
+Game.prototype.collider = function() {
+  this.plane.collider();
+  this.minions.forEach(function(minion){ minion.collider()})
+  
 };

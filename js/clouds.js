@@ -13,7 +13,9 @@ function Clouds (game, frame, opacity) {
 }
 
 Clouds.prototype.draw = function() {
+// setting canvas opacity  
 this.game.ctx.globalAlpha = this.opacity;  
+// drawing image (img object, Xframe pos, Yframe pos, width, height, Xpos, Ypos, width, height)
 this.game.ctx.drawImage(
   this.img,
   this.frameIndex*this.img.width / this.img.frames,
@@ -24,6 +26,7 @@ this.game.ctx.drawImage(
   this.y,
   this.w / this.img.frames,
   this.h);
+  // restoring opacity to canvas
   this.game.ctx.globalAlpha = 1.0;
 };
 
