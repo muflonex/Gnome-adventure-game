@@ -13,7 +13,7 @@ function Plane (game) {
   this.maxVelocity = 12;
   this.inertia = .97;
   this.img = new Image();
-  this.img.src = "./images/balloon.png";
+  this.img.src = "./images/balloon.svg";
   this.cannonballs = [];
 }
 

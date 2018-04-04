@@ -1,18 +1,30 @@
-function Clouds (game) {
+function Clouds (game, frame, opacity) {
   this.game = game;
   this.x = Math.floor(Math.random()*1200);
-  this.w = Math.floor(Math.random()*50)+350;
-  this.h = Math.floor(Math.random()*100)+550;
-  this.y = -this.h
-  this.deltaY = Math.floor(Math.random()*3)+1;
-
+  this.w = Math.floor(Math.random()*450)+650;
+  this.h = Math.floor(Math.random()*200)+350;
+  this.y = -this.h;
+  this.deltaY = (Math.random()*3)+1;
   this.img = new Image();
-  this.img.src = "./images/clouds.gif";
-  
+  this.img.src = "./images/cloud2.png";
+  this.img.frames = 3;
+  this.frameIndex = frame;
+  this.opacity = opacity
 }
 
 Clouds.prototype.draw = function() {
-this.game.ctx.drawImage(this.img, this.x,this.y, this.w, this.h);
+this.game.ctx.globalAlpha = this.opacity;  
+this.game.ctx.drawImage(
+  this.img,
+  this.frameIndex*this.img.width / this.img.frames,
+  0,
+  this.img.width / this.img.frames,
+  this.img.height,
+  this.x,
+  this.y,
+  this.w / this.img.frames,
+  this.h);
+  this.game.ctx.globalAlpha = 1.0;
 };
 
 Clouds.prototype.move = function() {

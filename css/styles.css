@@ -13,5 +13,5 @@ canvas {
   height: 100vh;
   display: flex;
   justify-content: center;
-  background-image: url('../images/wood.jpeg')
+  background-image: url('../images/wood.svg')
 }

@@ -5,7 +5,7 @@ function Background (game) {
   this.deltaY = 3;
 
   this.img = new Image();
-  this.img.src = "./images/sea3.png";
+  this.img.src = "./images/sea5.jpg";
 }
 
 Background.prototype.draw = function() {

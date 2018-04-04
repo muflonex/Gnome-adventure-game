@@ -20,14 +20,13 @@ Game.prototype.start = function() {
 
     this.clear();
     this.eliminateClouds();
+    this.generateClouds();
     this.plane.eliminateBalls();
     this.spawn(7);
     this.despawn();
     this.move();
     this.draw();
-    if (this.framesCounter % 70 === 0) {
-      this.generateClouds();
-    }
+
   }.bind(this), 1000 / 60);
   
   //this.started = true;
@@ -60,7 +59,11 @@ Game.prototype.move = function() {
 };
 
 Game.prototype.generateClouds = function(){
-  this.clouds.push(new Clouds(this))
+  if (this.framesCounter % 40 === 0) {
+    var randomFrame = Math.floor(Math.random()*3)
+    var randomOpacity = Math.random()*0.5+0.2
+    this.clouds.push(new Clouds(this, randomFrame, randomOpacity ))
+  }
 }
 Game.prototype.eliminateClouds = function(){
   this.clouds = this.clouds.filter(function(o) {
@@ -82,3 +85,17 @@ Game.prototype.despawn = function(){
     return minion.x > 0;
   })
 }
+
+Game.prototype.isCollision = function() {
+  var collision = false;
+  this.minions.forEach(function(minion){
+    if ( ( 
+      ( this.plane.x + this.plane.w ) > ( minion.x - minion.r ) ) &&
+      ( this.plane.x < ( minion.x + minion.r ) )  &&
+      ( this.plane.y + this.plane.h ) >= ( minion.y - minion.r ) &&
+      ( this.plane.y < ( minion.y - minion.r ) )
+    )
+      { collision = true; }
+  }.bind(this));
+  return collision;
+};

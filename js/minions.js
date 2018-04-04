@@ -1,6 +1,6 @@
 function Minion(game){
   this.game = game;
-  this.x = 1200
+  this.x = 1200;
   this.r = 20;
   this.y = this.r*2;
   this.velocity = 0;
