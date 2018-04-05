@@ -11,6 +11,8 @@ function Game(canvas){
   this.scoring = new Scoring(this, this.points)
   //Serves as stop flag for frame request
   this.pause = false;
+  this.endGameBack = new Image()
+  this.endGameBack.src = './images/parchment.jpg'
 }
 
 Game.prototype.start = function() {
@@ -71,7 +73,7 @@ Game.prototype.move = function() {
 
 Game.prototype.generateClouds = function(){
   // Generate a cloud every 40 ticks 
-  if (this.framesCounter % 40 === 0) {
+  if (this.framesCounter % 80 === 0) {
     // An argument for frame of the sprite to generate look
     var randomFrame = Math.floor(Math.random()*3)
     // An argument for random cloud opacity
@@ -103,7 +105,7 @@ Game.prototype.spawn = function(amount){
     // If there are no minions left on board
     if( this.minions.length === 0){
       // Push new minions into the array
-      for(i = 0 ; i <= amount ; i++){
+      for(i = 0 ; i < amount ; i++){
         // Amplify size of the wave
         // Position argument we pass to constructor so that 
         // each minion has unique X position for a particular meanie
@@ -124,6 +126,17 @@ Game.prototype.collider = function() {
 };
 
 Game.prototype.gameOverScreen = function(){
-    this.ctx.fillStyle="red";
-    this.ctx.fillRect(this.canvas.width/8,this.canvas.height/8,900, 500)
+  
+  var pattern=this.ctx.createPattern(this.endGameBack,"repeat");
+  this.ctx.save()
+  this.ctx.fillStyle=pattern;
+  this.ctx.shadowColor = 'black';
+  this.ctx.shadowBlur = 100;
+  this.ctx.fillRect(this.canvas.width/8,this.canvas.height/8,900, 500)
+  this.ctx.restore();
+  this.ctx.fillStyle = '#60401f';
+  this.ctx.font = 'small-caps bold 70pt Love Ya Like A Sister';
+  this.ctx.fillText("The gnome airship was destroyed!",this.canvas.width/4, this.canvas.height/3.5, 600,300)
+  this.ctx.font = 'small-caps bold 30pt Love Ya Like A Sister'
+  this.ctx.fillText("Your final score: " + this.points, this.canvas.width/3.5+100, this.canvas.height/3.5+100, 400,300)
 }

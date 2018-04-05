@@ -102,9 +102,30 @@ Plane.prototype.collider = function(){
        minion.y + minion.h -50 > this.y  &&                    
        minion.y -50 < this.y      
     )
-      { this.game.clear()
-        this.game.pause = true;
-        this.game.gameOverScreen()
-      }
+    // On crash with an enemy we remove all health from the airship
+      { this.health -= this.health  }
+    // We have to check status on all present fireballs
+    minion.fireballs.forEach(function(ball){
+      if (                                                                       
+        ball.x < this.w + this.x  &&
+        this.x < ball.x + ball.r  &&
+        ball.y < this.h + this.y  &&                    
+        this.y < ball.y + ball.r 
+     )
+       { minion.fireballs.splice(minion.fireballs.indexOf(ball),1)
+         this.health--
+       }
+    }.bind(this))
   }.bind(this));
+  // We check airship's status in collider because 
+  // it's the only situation where health varies 
+  this.status()
+}
+// Status serves for progressing into game over screen 
+Plane.prototype.status = function(){
+  if(this.health <= 0){
+    this.game.clear()
+    this.game.pause = true;
+    this.game.gameOverScreen()
+  }
 }

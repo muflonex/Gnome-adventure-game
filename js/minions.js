@@ -39,9 +39,13 @@ Minion.prototype.draw = function (amount){
       this.h
     )
   } 
-  if (this.game.framesCounter % 70 === 0){
+  var randomTime = Math.floor(Math.random()*5)+65
+  if (this.game.framesCounter % randomTime === 0){
     this.shoot();
   }
+  this.fireballs.forEach(function(ball){
+    ball.draw()
+  })
 }
 
 Minion.prototype.move = function () {

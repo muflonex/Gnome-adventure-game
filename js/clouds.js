@@ -13,8 +13,18 @@ function Clouds (game, frame, opacity) {
 }
 
 Clouds.prototype.draw = function() {
-// setting canvas opacity  
-this.game.ctx.globalAlpha = this.opacity;  
+// setting canvas opacity
+this.game.ctx.save()
+ 
+this.game.ctx.globalAlpha = this.opacity; 
+// Shadows are expensive, especially if we don't perform our animation as canvas translation
+// Therefore we skip on objects that have low opacity anyway
+if(this.opacity > 0.4){
+  this.game.ctx.shadowColor = 'rgba(0, 0, 0  ,'+this.opacity+')';
+  this.game.ctx.shadowBlur = 20;
+  this.game.ctx.shadowOffsetX = 55;
+  this.game.ctx.shadowOffsetY = 55; 
+}
 // drawing image (img object, Xframe pos, Yframe pos, width, height, Xpos, Ypos, width, height)
 this.game.ctx.drawImage(
   this.img,
@@ -28,6 +38,7 @@ this.game.ctx.drawImage(
   this.h);
   // restoring opacity to canvas
   this.game.ctx.globalAlpha = 1.0;
+this.game.ctx.restore()
 };
 
 Clouds.prototype.move = function() {

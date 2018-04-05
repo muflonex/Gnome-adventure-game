@@ -20,4 +20,5 @@ Cannonball.prototype.draw = function () {
 
 Cannonball.prototype.move = function () {
   this.y -= this.ballVelocityY
+  //Gnomes are not so smart as dragons so they don't make adjustment for their velocity
 };

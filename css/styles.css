@@ -9,7 +9,7 @@ canvas {
   border-color: goldenrod;
   margin: 0 auto;
   width: auto; 
-  background-color: #1a0d00;
+  background-image: url('../images/brown_background.jpg');
 }
 .container{
   height: 100vh;
