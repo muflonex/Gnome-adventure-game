@@ -5,7 +5,7 @@ function Minion(game, x){
   this.h = 150;
   this.w = 150;
   this.y = 60;
-  this.velocity = 0;
+  this.velocity = 5;
   this.frameIndex = Math.floor(Math.random()*5)+1
   
   this.health = 3;
@@ -14,7 +14,7 @@ function Minion(game, x){
   this.img.src = "./images/dragonling.png";
   this.img.frames = 5;
 
-  this.fireballs = []
+
   
 }
 Minion.prototype.animate = function () {
@@ -39,11 +39,11 @@ Minion.prototype.draw = function (amount){
       this.h
     )
   } 
-  var randomTime = Math.floor(Math.random()*5)+65
+  var randomTime = 75+Math.floor(Math.random()*75)
   if (this.game.framesCounter % randomTime === 0){
     this.shoot();
   }
-  this.fireballs.forEach(function(ball){
+  this.game.fireballs.forEach(function(ball){
     ball.draw()
   })
 }
@@ -52,8 +52,6 @@ Minion.prototype.move = function () {
   // When the last minion's right edge leaves the screen we reset their position
   var leftEdge = this.game.minions[this.game.minions.length-1].x
   var rightEdge = this.game.minions[this.game.minions.length-1].w
-  
-  this.velocity = 5;
 
   this.x -= this.velocity
   if(leftEdge+rightEdge<0)
@@ -63,9 +61,11 @@ Minion.prototype.move = function () {
 };
 
 Minion.prototype.shoot = function(){
-  this.fireballs.push(new Fireball(this.game, this))
+  this.game.fireballs.push(new Fireball(this.game, this))
 }
-
+Minion.prototype.dropPack = function(){
+  this.game.packs.push(new LifePack(this.game, this))
+}
 // Check for collisions between balls and monsters
 Minion.prototype.collider = function(){  
   var ballz = this.game.plane.cannonballs
@@ -93,6 +93,7 @@ Minion.prototype.collider = function(){
 Minion.prototype.despawn = function(){
     var meanies = this.game.minions;
   if(this.health === 0){
+    this.dropPack();
     meanies.splice(meanies.indexOf(this), 1)
     this.game.points += 100
   }

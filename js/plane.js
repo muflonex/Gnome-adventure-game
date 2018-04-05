@@ -105,18 +105,35 @@ Plane.prototype.collider = function(){
     // On crash with an enemy we remove all health from the airship
       { this.health -= this.health  }
     // We have to check status on all present fireballs
-    minion.fireballs.forEach(function(ball){
-      if (                                                                       
-        ball.x < this.w + this.x  &&
-        this.x < ball.x + ball.r  &&
-        ball.y < this.h + this.y  &&                    
-        this.y < ball.y + ball.r 
-     )
-       { minion.fireballs.splice(minion.fireballs.indexOf(ball),1)
-         this.health--
-       }
-    }.bind(this))
+    
   }.bind(this));
+  this.game.packs.forEach(function(pack){
+    // We reduce collision box of the pack because
+    // it's a sprite that has larger frames than it's visible size
+    if (                                                                       
+       this.x < pack.x + pack.w &&
+       pack.x < this.x + this.w &&
+       this.y < pack.y + pack.h &&                    
+       pack.y < this.y + this.h     
+    )
+    // On crash with an enemy we remove all health from the airship
+      { this.game.packs.splice(this.game.packs.indexOf(pack),1)
+        this.health++
+          }
+    // We have to check status on all present fireballs
+    
+  }.bind(this));
+  this.game.fireballs.forEach(function(ball){
+    if (                                                                       
+      ball.x < this.w + this.x  &&
+      this.x < ball.x + ball.r  &&
+      ball.y < this.h + this.y  &&                    
+      this.y < ball.y + ball.r 
+   )
+     { this.game.fireballs.splice(this.game.fireballs.indexOf(ball),1)
+       this.health--
+     }
+  }.bind(this))
   // We check airship's status in collider because 
   // it's the only situation where health varies 
   this.status()

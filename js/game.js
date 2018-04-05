@@ -4,14 +4,16 @@ function Game(canvas){
   this.background = new Background(this);
   this.plane = new Plane(this);
   this.clouds = [ new Clouds(this), new Clouds(this), new Clouds(this) ];
-  this.minions = []
+  this.minions = [];
+  this.packs = [];
+  this.fireballs = [];
   this.framesCounter = 0;
   this.waveSize = 3;
-  this.points = 0
-  this.scoring = new Scoring(this, this.points)
+  this.points = 0;
+  this.scoring = new Scoring(this, this.points);
   //Serves as stop flag for frame request
   this.pause = false;
-  this.endGameBack = new Image()
+  this.endGameBack = new Image();
   this.endGameBack.src = './images/parchment.jpg'
 }
 
@@ -23,16 +25,18 @@ Game.prototype.start = function() {
   this.framesCounter++;
 
   // We reset counter to facilitate event repetition
-  if (this.framesCounter > 1000) this.framesCounter = 0;
+  if (this.framesCounter > 1000){ this.framesCounter = 0;}
   
   this.clear();
   this.eliminateClouds();
-  this.generateClouds();
+  this.eliminatePacks();
   this.eliminateBalls();
+  this.generateClouds();
   this.spawn(this.waveSize);
   this.move();
   this.draw();
   this.minions.forEach(function(minion){ minion.animate()})
+  this.packs.forEach(function(pack){ pack.animate()})
   // We check for collisions
   this.collider();
   // It's simpler way of stopping frame request without encapsulating it
@@ -49,6 +53,9 @@ Game.prototype.draw = function() {
   this.plane.draw();
   this.minions.forEach(function(minion){ minion.draw(this.waveSize) }.bind(this))
   this.scoring.draw()
+  this.packs.forEach(function(pack){
+    pack.draw()
+  })
 };
 
 Game.prototype.clear = function() {
@@ -61,11 +68,9 @@ Game.prototype.move = function() {
   this.background.move();
   this.clouds.forEach(function(o) { o.move(); })
   this.plane.cannonballs.forEach(function(ball) { ball.move() })
-  this.minions.forEach(function(minion){
-    minion.fireballs.forEach(function(ball){
+  this.fireballs.forEach(function(ball){
       ball.move()
     })
-  })
   this.plane.move();
   this.minions.forEach(function(minion){ minion.move() })
   
@@ -87,15 +92,18 @@ Game.prototype.eliminateClouds = function(){
     return o.y < 650;
   })
 }
+Game.prototype.eliminatePacks = function(){
+  this.packs = this.packs.filter(function(pack) {
+    return pack.y < 650;
+  })
+}
 //We clear all balls that left canvas out of the cannonballs and fireballs array
 Game.prototype.eliminateBalls = function(){
   this.plane.cannonballs.filter(function(ball){
-    return ball.y > 0
+    return ball.y < 650
   })
-  this.minions.forEach(function(minion){
-    minion.fireballs.filter(function(ball){
-      return ball.y < 700
-    })
+  this.fireballs.filter(function(ball){
+    return ball.y < 650
   })
 }
 // Evil meanies spawning mechanism
@@ -124,19 +132,44 @@ Game.prototype.collider = function() {
   this.minions.forEach(function(minion){ minion.collider()})
   
 };
-
+Game.prototype.restoreListener = function () {
+//  A button for restoring the game
+document.onkeydown = function (event) {
+  if (event.keyCode === 32){
+    console.log("entered")
+    location.reload()
+    }
+  }.bind(this)
+}
 Game.prototype.gameOverScreen = function(){
-  
+  var width = this.canvas.width
+  var height = this.canvas.height
+  var ctx = this.ctx
   var pattern=this.ctx.createPattern(this.endGameBack,"repeat");
-  this.ctx.save()
-  this.ctx.fillStyle=pattern;
-  this.ctx.shadowColor = 'black';
-  this.ctx.shadowBlur = 100;
-  this.ctx.fillRect(this.canvas.width/8,this.canvas.height/8,900, 500)
-  this.ctx.restore();
-  this.ctx.fillStyle = '#60401f';
-  this.ctx.font = 'small-caps bold 70pt Love Ya Like A Sister';
-  this.ctx.fillText("The gnome airship was destroyed!",this.canvas.width/4, this.canvas.height/3.5, 600,300)
-  this.ctx.font = 'small-caps bold 30pt Love Ya Like A Sister'
-  this.ctx.fillText("Your final score: " + this.points, this.canvas.width/3.5+100, this.canvas.height/3.5+100, 400,300)
+  ctx.save()
+  ctx.fillStyle=pattern;
+  ctx.shadowColor = 'black';
+  ctx.shadowBlur = 100;
+  ctx.fillRect(width/8,height/8,900, 500)
+  ctx.restore();
+  ctx.strokeStyle = '#ffffb3'
+  ctx.lineWidth=10;
+  ctx.strokeRect(width/8,height/8,900, 500)
+  ctx.fillStyle = '#60401f';
+  ctx.font = 'small-caps bold 70pt Love Ya Like A Sister';
+  ctx.fillText("The gnome airship was destroyed!",width/4, height/3.5, width/2,300)
+  ctx.font = 'small-caps bold 30pt Love Ya Like A Sister'
+  ctx.fillText("Your final score: " + this.points, width/3.5+100, height/3.5+100, 400,300)
+  ctx.fillStyle = '#60401f';
+  ctx.fillRect(width/4, height/2, width/2, height/7)
+  ctx.lineWidth=2;
+  ctx.strokeStyle = "black"
+  ctx.strokeRect(width/4, height/2, width/2, height/7);
+  ctx.fillStyle = '#ffffb3'
+  ctx.save()
+  ctx.shadowColor = 'black';
+  ctx.shadowBlur = 10;
+  ctx.fillText("Press space to continue", width/4 + 150, height/2+height/12)
+  ctx.restore();
+  this.restoreListener()
 }
