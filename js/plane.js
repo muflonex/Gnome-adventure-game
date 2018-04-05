@@ -6,8 +6,7 @@ function Plane (game) {
   // put the airship in the middle of canvas' width
   this.x = this.game.canvas.width/2;
   //
-  this.y0 = (this.game.canvas.height-150);
-  this.y = this.y0;
+  this.y = (this.game.canvas.height-150);
   this.w = 80;
   this.h = 120;
   this.velocityX = 0;
@@ -18,6 +17,7 @@ function Plane (game) {
   this.img = new Image();
   this.img.src = "./images/balloon.svg";
   this.cannonballs = [];
+  this.health = 3;
 }
 
 Plane.prototype.draw = function(){
@@ -89,12 +89,7 @@ Plane.prototype.move = function(){
 Plane.prototype.shoot = function(){
   this.cannonballs.push(new Cannonball(this.game, this))
 }
-//We clear all balls that left canvas out of the cannonballs array
-Plane.prototype.eliminateBalls = function(){
-  this.cannonballs.filter(function(ball){
-    return ball.y > 0
-  })
-}
+
 // Check for plane collisions
 Plane.prototype.collider = function(){
   var planeCollision = false;
@@ -109,7 +104,7 @@ Plane.prototype.collider = function(){
     )
       { this.game.clear()
         this.game.pause = true;
-        confirm("You've died!");
+        this.game.gameOverScreen()
       }
   }.bind(this));
 }

@@ -4,9 +4,11 @@ function Game(canvas){
   this.background = new Background(this);
   this.plane = new Plane(this);
   this.clouds = [ new Clouds(this), new Clouds(this), new Clouds(this) ];
+  this.minions = []
   this.framesCounter = 0;
   this.waveSize = 3;
-  this.minions = []
+  this.points = 0
+  this.scoring = new Scoring(this, this.points)
   //Serves as stop flag for frame request
   this.pause = false;
 }
@@ -24,7 +26,7 @@ Game.prototype.start = function() {
   this.clear();
   this.eliminateClouds();
   this.generateClouds();
-  this.plane.eliminateBalls();
+  this.eliminateBalls();
   this.spawn(this.waveSize);
   this.move();
   this.draw();
@@ -44,6 +46,7 @@ Game.prototype.draw = function() {
   this.clouds.forEach(function(nimbus) { nimbus.draw(); })
   this.plane.draw();
   this.minions.forEach(function(minion){ minion.draw(this.waveSize) }.bind(this))
+  this.scoring.draw()
 };
 
 Game.prototype.clear = function() {
@@ -56,6 +59,11 @@ Game.prototype.move = function() {
   this.background.move();
   this.clouds.forEach(function(o) { o.move(); })
   this.plane.cannonballs.forEach(function(ball) { ball.move() })
+  this.minions.forEach(function(minion){
+    minion.fireballs.forEach(function(ball){
+      ball.move()
+    })
+  })
   this.plane.move();
   this.minions.forEach(function(minion){ minion.move() })
   
@@ -75,6 +83,17 @@ Game.prototype.generateClouds = function(){
 Game.prototype.eliminateClouds = function(){
   this.clouds = this.clouds.filter(function(o) {
     return o.y < 650;
+  })
+}
+//We clear all balls that left canvas out of the cannonballs and fireballs array
+Game.prototype.eliminateBalls = function(){
+  this.plane.cannonballs.filter(function(ball){
+    return ball.y > 0
+  })
+  this.minions.forEach(function(minion){
+    minion.fireballs.filter(function(ball){
+      return ball.y < 700
+    })
   })
 }
 // Evil meanies spawning mechanism
@@ -103,3 +122,8 @@ Game.prototype.collider = function() {
   this.minions.forEach(function(minion){ minion.collider()})
   
 };
+
+Game.prototype.gameOverScreen = function(){
+    this.ctx.fillStyle="red";
+    this.ctx.fillRect(this.canvas.width/8,this.canvas.height/8,900, 500)
+}

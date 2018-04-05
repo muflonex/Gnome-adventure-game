@@ -4,7 +4,7 @@ function Minion(game, x){
   this.x = 1200 + x;
   this.h = 150;
   this.w = 150;
-  this.y = 20;
+  this.y = 60;
   this.velocity = 0;
   this.frameIndex = Math.floor(Math.random()*5)+1
   
@@ -13,10 +13,19 @@ function Minion(game, x){
   this.img = new Image();
   this.img.src = "./images/dragonling.png";
   this.img.frames = 5;
+
+  this.fireballs = []
   
 }
-
-Minion.prototype.dragonlings = function(amount){
+Minion.prototype.animate = function () {
+  if ( this.game.framesCounter % 15 === 0 ) {
+    this.frameIndex += 1;
+    if (this.frameIndex > 2) {
+      this.frameIndex = 0;
+    }
+  }
+};
+Minion.prototype.draw = function (amount){
   for(i = 0; i <= amount; i++){
     this.game.ctx.drawImage(
       this.img,
@@ -30,20 +39,13 @@ Minion.prototype.dragonlings = function(amount){
       this.h
     )
   } 
-}
-Minion.prototype.animate = function () {
-  if ( this.game.framesCounter % 15 === 0 ) {
-    this.frameIndex += 1;
-    if (this.frameIndex > 2) {
-      this.frameIndex = 0;
-    }
+  if (this.game.framesCounter % 70 === 0){
+    this.shoot();
   }
-};
-Minion.prototype.draw = function (amount){
-  this.dragonlings(amount);
 }
 
 Minion.prototype.move = function () {
+  // When the last minion's right edge leaves the screen we reset their position
   var leftEdge = this.game.minions[this.game.minions.length-1].x
   var rightEdge = this.game.minions[this.game.minions.length-1].w
   
@@ -55,6 +57,11 @@ Minion.prototype.move = function () {
     minion.x = 1200+200*index
   }) }    
 };
+
+Minion.prototype.shoot = function(){
+  this.fireballs.push(new Fireball(this.game, this))
+}
+
 // Check for collisions between balls and monsters
 Minion.prototype.collider = function(){  
   var ballz = this.game.plane.cannonballs
@@ -69,7 +76,8 @@ Minion.prototype.collider = function(){
        ball.y < this.h + this.y -25 &&                    
        this.y < ball.y + ball.r -25
       )     
-      { this.health -=1   
+      { this.health -=1
+        this.game.points += 10   
         // remove ball after it hits a target
         ballz.splice(ballz.indexOf(ball),1)
         // despawn dragons if they run out of health
@@ -82,5 +90,6 @@ Minion.prototype.despawn = function(){
     var meanies = this.game.minions;
   if(this.health === 0){
     meanies.splice(meanies.indexOf(this), 1)
+    this.game.points += 100
   }
 }
