@@ -9,22 +9,26 @@ function Minion(game, x){
   this.frameIndex = Math.floor(Math.random()*5)+1
   
   this.health = 3;
-
+  this.receivedDamage = false;
   this.img = new Image();
-  this.img.src = "./images/dragonling.png";
-  this.img.frames = 5;
-
-
-  
+  this.img.src = "./images/dragonling_damage.png";
+  this.img.frames = 6;
 }
 Minion.prototype.animate = function () {
   if ( this.game.framesCounter % 15 === 0 ) {
     this.frameIndex += 1;
-    if (this.frameIndex > 2) {
+    if(this.receivedDamage === true){
+      this.frameIndex = 5
+      if(this.game.framesCounter %60 === 0)
+        this.receivedDamage = false
+      }
+    }else if(this.receivedDamage ===false){
+      if (this.frameIndex > 3) {
       this.frameIndex = 0;
     }
   }
-};
+}
+
 Minion.prototype.draw = function (amount){
   for(i = 0; i <= amount; i++){
     this.game.ctx.drawImage(
@@ -81,6 +85,7 @@ Minion.prototype.collider = function(){
        this.y < ball.y + ball.r -25
       )     
       { this.health -=1
+        this.receivedDamage = true;
         this.game.points += 10   
         // remove ball after it hits a target
         ballz.splice(ballz.indexOf(ball),1)

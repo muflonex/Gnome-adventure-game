@@ -5,7 +5,7 @@ function LifePack(game, minion) {
   this.h = 70;
   this.x = this.minion.x + this.minion.w /2
   this.y = this.minion.y + this.minion.h
-  this.velocity = 5;
+  this.velocity = 10;
   this.sprite = new Image();
   this.sprite.src = "./images/spinning_heart.png";
   this.sprite.frames = 5;
@@ -27,7 +27,7 @@ LifePack.prototype.draw = function () {
 };
 
 LifePack.prototype.animate = function () {
-  if ( this.game.framesCounter % 15 === 0 ) {
+  if ( this.game.framesCounter % 5 === 0 ) {
     this.sprite.frameIndex += 1;
     // Here a small trick from Susana - 
     // we don't have to call move in game for that specific object

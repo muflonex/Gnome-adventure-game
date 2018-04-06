@@ -10,5 +10,5 @@ window.onload = function() {
     || window.mozCancelAnimationFrame
     || function(requestID){clearTimeout(requestID)}
   
-  game.start();
+  game.startScreen();
 }

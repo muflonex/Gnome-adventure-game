@@ -9,15 +9,17 @@ function Game(canvas){
   this.fireballs = [];
   this.framesCounter = 0;
   this.waveSize = 3;
+  this.splashActive = false;
   this.points = 0;
   this.scoring = new Scoring(this, this.points);
   //Serves as stop flag for frame request
-  this.pause = false;
-  this.endGameBack = new Image();
-  this.endGameBack.src = './images/parchment.jpg'
+  this.pause = true;
+  this.boxBackcg = new Image();
+  this.boxBackcg.src = './images/parchment.jpg'
 }
 
 Game.prototype.start = function() {
+  this.pause = false;
   //we initiate key listeners for the airship movement
   this.plane.setListeners();
   // We count frames for events that occur with
@@ -31,6 +33,7 @@ Game.prototype.start = function() {
   this.eliminateClouds();
   this.eliminatePacks();
   this.eliminateBalls();
+  this.eliminateFire();
   this.generateClouds();
   this.spawn(this.waveSize);
   this.move();
@@ -56,6 +59,7 @@ Game.prototype.draw = function() {
   this.packs.forEach(function(pack){
     pack.draw()
   })
+  this.waveSplash()
 };
 
 Game.prototype.clear = function() {
@@ -99,12 +103,18 @@ Game.prototype.eliminatePacks = function(){
 }
 //We clear all balls that left canvas out of the cannonballs and fireballs array
 Game.prototype.eliminateBalls = function(){
-  this.plane.cannonballs.filter(function(ball){
-    return ball.y < 650
-  })
-  this.fireballs.filter(function(ball){
-    return ball.y < 650
-  })
+  for(i = 0; i<this.plane.cannonballs.length; i++){
+    if(this.plane.cannonballs[i].y < 0){
+      this.plane.cannonballs.splice(this.plane.cannonballs.indexOf(this.plane.cannonballs[i],1))
+    }  
+  }
+}
+Game.prototype.eliminateFire = function(){
+  for(i = 0; i<this.fireballs.length; i++){
+    if(this.fireballs[i].y > 700){
+      this.fireballs.splice(this.fireballs.indexOf(this.fireballs[i],1))
+    }  
+  }
 }
 // Evil meanies spawning mechanism
 Game.prototype.spawn = function(amount){
@@ -112,6 +122,7 @@ Game.prototype.spawn = function(amount){
   if (this.framesCounter % 70 === 0) {
     // If there are no minions left on board
     if( this.minions.length === 0){
+      this.splashActive = true
       // Push new minions into the array
       for(i = 0 ; i < amount ; i++){
         // Amplify size of the wave
@@ -124,7 +135,16 @@ Game.prototype.spawn = function(amount){
     }
   }
 }
-
+Game.prototype.waveSplash = function(){
+  if (this.splashActive){
+    this.ctx.font = 'small-caps bold 100pt Love Ya Like A Sister'
+    this.ctx.fillStyle = "#ff3333"
+    this.ctx.fillText("Wave "+(this.waveSize-3), this.canvas.width/3, this.canvas.height/2)
+  }
+  if(this.framesCounter % 200 === 0){
+    this.splashActive = false
+  }
+}
 
 // Colission checking function - will call respective functions later on
 Game.prototype.collider = function() {
@@ -136,8 +156,14 @@ Game.prototype.restoreListener = function () {
 //  A button for restoring the game
 document.onkeydown = function (event) {
   if (event.keyCode === 32){
-    console.log("entered")
     location.reload()
+    }
+  }.bind(this)
+}
+Game.prototype.startListener = function() {
+  document.onkeydown = function (event) {
+    if (event.keyCode === 32){
+      this.start()
     }
   }.bind(this)
 }
@@ -145,7 +171,7 @@ Game.prototype.gameOverScreen = function(){
   var width = this.canvas.width
   var height = this.canvas.height
   var ctx = this.ctx
-  var pattern=this.ctx.createPattern(this.endGameBack,"repeat");
+  var pattern=this.ctx.createPattern(this.boxBackcg,"repeat");
   ctx.save()
   ctx.fillStyle=pattern;
   ctx.shadowColor = 'black';
@@ -172,4 +198,31 @@ Game.prototype.gameOverScreen = function(){
   ctx.fillText("Press space to continue", width/4 + 150, height/2+height/12)
   ctx.restore();
   this.restoreListener()
+}
+
+Game.prototype.startScreen = function(){
+  var width = this.canvas.width
+  var height = this.canvas.height
+  var ctx = this.ctx
+ 
+  ctx.fillRect(width/8,height/8,900, 500);
+  ctx.strokeStyle = '#ffffb3';
+  ctx.lineWidth=10;
+  ctx.strokeRect(width/8,height/8,900, 500)
+  ctx.fillStyle = '#60401f';
+  ctx.font = 'small-caps bold 70pt Love Ya Like A Sister';
+  ctx.fillText("Gnome adventure of Dragons!",width/4, height/3.5, width/2,300)
+  ctx.fillStyle = '#60401f';
+  ctx.fillRect(width/4, height/2, width/2, height/7)
+  ctx.lineWidth=2;
+  ctx.strokeStyle = "black"
+  ctx.strokeRect(width/4, height/2, width/2, height/7);
+  ctx.fillStyle = '#ffffb3'
+  ctx.save()
+  ctx.shadowColor = 'black';
+  ctx.shadowBlur = 10;
+  ctx.font = 'small-caps bold 30pt Love Ya Like A Sister';
+  ctx.fillText("Press space to start", width/4 + 150, height/2+height/12)
+  ctx.restore();
+  this.startListener() 
 }
