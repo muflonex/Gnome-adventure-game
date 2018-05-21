@@ -23,8 +23,11 @@ Scoring.prototype.draw = function(score){
   for(i = 0; i < this.game.plane.health; i++){
     if(i <6)
     { context.drawImage(this.hearts, 380+50*i,20, 50, 40) }
-    else if(i => 7 && i < 14){
+    else if(i => 7 && i < 13){
       context.drawImage(this.hearts, 380+50*(i-6),70, 50, 40)
+    }
+    else{
+      context.drawImage(this.hearts, 380+50*(i-13),120, 50, 40)
     }
   }
 }

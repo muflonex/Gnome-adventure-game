@@ -38,10 +38,10 @@ Plane.prototype.setListeners = function () {
   // It means that effects of two buttons can apply
   document.onkeydown = function (event) {
     keys[event.keyCode] = true;
-  }.bind(this)
+  }
   document.onkeyup = function (event) {
     keys[event.keyCode] = false;
-  }.bind(this)
+  }
 }
 
 Plane.prototype.move = function(){

@@ -1,4 +1,8 @@
 @import url('https://fonts.googleapis.com/css?family=Love+Ya+Like+A+Sister');
+@font-face {
+  font-family: 'Carousel';
+  src: url('../fonts/Carousel.ttf');
+}
 
 body{
   margin: 0;  

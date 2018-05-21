@@ -15,13 +15,18 @@ function Minion(game, x){
   this.img.frames = 6;
 }
 Minion.prototype.animate = function () {
+  //Managing movement frames for dragons
   if ( this.game.framesCounter % 15 === 0 ) {
+    //Every 15 ticks we change frame
     this.frameIndex += 1;
+    //We use special frame for damage
     if(this.receivedDamage === true){
       this.frameIndex = 5
+      //Clear special state after 60 ticks
       if(this.game.framesCounter %60 === 0)
         this.receivedDamage = false
       }
+    //Rewind frames
     }else if(this.receivedDamage ===false){
       if (this.frameIndex > 3) {
       this.frameIndex = 0;
@@ -73,7 +78,6 @@ Minion.prototype.dropPack = function(){
 // Check for collisions between balls and monsters
 Minion.prototype.collider = function(){  
   var ballz = this.game.plane.cannonballs
-  var meanies = this.game.minions
 
   ballz.forEach(function(ball){
     if(       
